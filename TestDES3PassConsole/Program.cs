@@ -16,6 +16,37 @@ namespace TestDESCBC3PassAuthentication
     {
         static void Main(string[] args)
         {
+            Test3DES_3PassAuthentication();
+        }
+
+        static void Test3DES()
+        {
+            TripleDESCryptoServiceProvider tripleDESCrypto = new TripleDESCryptoServiceProvider();
+            tripleDESCrypto.KeySize = 128;
+            tripleDESCrypto.Mode = CipherMode.CBC;
+            tripleDESCrypto.Padding = PaddingMode.Zeros;
+            tripleDESCrypto.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            RandomNumberGenerator random = RNGCryptoServiceProvider.Create();
+            byte[] rnd = new byte[8];
+            random.GetNonZeroBytes(rnd);
+
+            ICryptoTransform encryptor = tripleDESCrypto.CreateEncryptor();
+            byte[] encRnd = encryptor.TransformFinalBlock(rnd, 0, 8);
+
+            TripleDESCryptoServiceProvider tripleDESCrypto2 = new TripleDESCryptoServiceProvider();
+            tripleDESCrypto2.KeySize = 128;
+            tripleDESCrypto2.Mode = CipherMode.CBC;
+            tripleDESCrypto2.Padding = PaddingMode.Zeros;
+            tripleDESCrypto2.IV = tripleDESCrypto.IV;
+            tripleDESCrypto2.Key = tripleDESCrypto.Key;
+
+            ICryptoTransform decryptor = tripleDESCrypto2.CreateDecryptor();
+            byte[] decRnd = decryptor.TransformFinalBlock(encRnd, 0, 8);
+        }
+
+        static void Test3DES_3PassAuthentication()
+        {
             PICC picc = new PICC();
 
             byte[] key = picc.Key;
@@ -59,32 +90,6 @@ namespace TestDESCBC3PassAuthentication
             {
                 Console.WriteLine("PCD not authenticated by PICC");
             }
-        }
-
-        static void Test3DES()
-        {
-            TripleDESCryptoServiceProvider tripleDESCrypto = new TripleDESCryptoServiceProvider();
-            tripleDESCrypto.KeySize = 128;
-            tripleDESCrypto.Mode = CipherMode.CBC;
-            tripleDESCrypto.Padding = PaddingMode.Zeros;
-            tripleDESCrypto.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            RandomNumberGenerator random = RNGCryptoServiceProvider.Create();
-            byte[] rnd = new byte[8];
-            random.GetNonZeroBytes(rnd);
-
-            ICryptoTransform encryptor = tripleDESCrypto.CreateEncryptor();
-            byte[] encRnd = encryptor.TransformFinalBlock(rnd, 0, 8);
-
-            TripleDESCryptoServiceProvider tripleDESCrypto2 = new TripleDESCryptoServiceProvider();
-            tripleDESCrypto2.KeySize = 128;
-            tripleDESCrypto2.Mode = CipherMode.CBC;
-            tripleDESCrypto2.Padding = PaddingMode.Zeros;
-            tripleDESCrypto2.IV = tripleDESCrypto.IV;
-            tripleDESCrypto2.Key = tripleDESCrypto.Key;
-
-            ICryptoTransform decryptor = tripleDESCrypto2.CreateDecryptor();
-            byte[] decRnd = decryptor.TransformFinalBlock(encRnd, 0, 8);
         }
     }
 }
