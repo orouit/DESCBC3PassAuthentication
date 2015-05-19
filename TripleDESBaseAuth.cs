@@ -12,17 +12,18 @@ namespace Core.Security
 {
     public abstract class TripleDESBaseAuth : IKeySupport
     {
-        private readonly byte[] IV;
+        protected readonly byte[] IV;
         protected const int RND_SIZE = 8;
         protected const int SESSION_KEY_SIZE = 16;
         protected const int IV_SIZE = 8;
 
-        protected TripleDESCryptoServiceProvider tripleDESCrypto = new TripleDESCryptoServiceProvider();
+        protected SymmetricAlgorithm symmetricCryptoAlgo = new TripleDESCryptoServiceProvider();
         protected ICryptoTransform encryptor;
         protected ICryptoTransform decryptor;
         protected byte[] rndA;
         protected byte[] rndB;
         protected bool authenticated = false;
+        protected byte[] weakKey = null;
 
         protected RandomNumberGenerator randomGenerator;
 
@@ -32,25 +33,39 @@ namespace Core.Security
         {
             IV = new byte[IV_SIZE];
             ByteArray.Fill(IV, 0);
-            tripleDESCrypto.KeySize = 128;  // Mode 2
-            tripleDESCrypto.Padding = PaddingMode.Zeros;
-            tripleDESCrypto.Mode = CipherMode.CBC;
-            tripleDESCrypto.IV = IV;
+            symmetricCryptoAlgo.KeySize = 128;  // Mode 2
+            symmetricCryptoAlgo.Padding = PaddingMode.Zeros;
+            symmetricCryptoAlgo.Mode = CipherMode.CBC;
+            symmetricCryptoAlgo.IV = IV;
 
             randomGenerator = RNGCryptoServiceProvider.Create();
 
-            encryptor = tripleDESCrypto.CreateEncryptor();
-            decryptor = tripleDESCrypto.CreateDecryptor();
+            encryptor = symmetricCryptoAlgo.CreateEncryptor();
+            decryptor = symmetricCryptoAlgo.CreateDecryptor();
         }
 
         protected TripleDESBaseAuth(byte[] key)
             : this()
         {
-            tripleDESCrypto.Key = key;
+            if (ByteArray.IsSetOf(key))
+            {
+                symmetricCryptoAlgo = new TripleDESCryptoServiceProvider();
+                weakKey = key;
+                symmetricCryptoAlgo.Padding = PaddingMode.Zeros;
+                symmetricCryptoAlgo.Mode = CipherMode.CBC;
+                symmetricCryptoAlgo.IV = IV;
 
-            // Recreate the encryptor and decryptor
-            encryptor = tripleDESCrypto.CreateEncryptor();
-            decryptor = tripleDESCrypto.CreateDecryptor();
+                encryptor = ((TripleDESCryptoServiceProvider)symmetricCryptoAlgo).CreateWeakEncryptor(key, IV);
+                decryptor = ((TripleDESCryptoServiceProvider)symmetricCryptoAlgo).CreateWeakDecryptor(key, IV);
+            }
+            else
+            {
+                symmetricCryptoAlgo.Key = key;
+
+                // Recreate the encryptor and decryptor
+                encryptor = symmetricCryptoAlgo.CreateEncryptor();
+                decryptor = symmetricCryptoAlgo.CreateDecryptor();
+            }
         }
 
         #endregion
@@ -59,7 +74,9 @@ namespace Core.Security
         {
             get
             {
-                return tripleDESCrypto.Key;
+                return (weakKey == null)
+                    ? symmetricCryptoAlgo.Key
+                    : weakKey;
             }
         }
 

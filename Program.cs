@@ -6,8 +6,9 @@
 
 using Core.Security;
 using Core.Utility;
-
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace TestDESCBC3PassAuthentication
@@ -16,15 +17,31 @@ namespace TestDESCBC3PassAuthentication
     {
         static void Main(string[] args)
         {
-            PICC picc = new PICC();
+            List<char> values = new List<char>() { '1', '2', '3' };
+
+            char point = values.Where(c => c == '.').FirstOrDefault();
+            int value = 1000;
+            byte[] valueBytes = BitConverter.GetBytes(value);
+            byte[] mifareBytes = ByteArray.ReverseBuffer(valueBytes);
+
+            float fValue = 2345f;
+            string textValue = string.Format("{0:0.00}", fValue);
+
+            // Use Key = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+            byte[] key0 = new byte[16];
+            ByteArray.Fill(key0, 0);
+            PICC picc = new PICC(key0);
 
             byte[] key = picc.Key;
             Console.WriteLine(string.Format(">> 3DES Key:          {0}", ByteArray.ToString(key)));
 
-            byte[] encrRndB = picc.AuthenticateStep1();
+            byte[] encRndB = picc.AuthenticateStep1();
+
+            //byte[] encRndB = ByteArray.Parse("2989B545BC7172A2");
 
             PCD pcd = new PCD(key);
-            byte[] decRndABr = pcd.AuthenticateStep2(encrRndB);
+            byte[] decRndABr = pcd.AuthenticateStep2(encRndB);
+            string decRndABrStr = ByteArray.ToString(decRndABr);
 
             byte[] encRndAr;
             bool pcdAuthenticated = picc.AuthenticateStep3(decRndABr, out encRndAr);

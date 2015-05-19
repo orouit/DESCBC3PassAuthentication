@@ -6,6 +6,7 @@
 
 using Core.Utility;
 using System;
+using System.Security.Cryptography;
 
 namespace Core.Security
 {
@@ -46,9 +47,18 @@ namespace Core.Security
             // Create rndA + rndBr
             byte[] rndABr = ByteArray.Concatenate(rndA, rndBr);
             Console.WriteLine(string.Format(">> RndA + RndB':      {0}", ByteArray.ToString(rndABr)));
+            decryptor = ((TripleDESCryptoServiceProvider)symmetricCryptoAlgo).CreateWeakDecryptor(weakKey, IV);
+            byte[] decRndBr_1 = decryptor.TransformFinalBlock(rndABr, 0, rndABr.Length);
+
+            // Decrypt RndA
+            decryptor = ((TripleDESCryptoServiceProvider)symmetricCryptoAlgo).CreateWeakDecryptor(weakKey, IV);
+            byte[] decRndA = decryptor.TransformFinalBlock(rndA, 0, RND_SIZE);
+
+            decryptor = ((TripleDESCryptoServiceProvider)symmetricCryptoAlgo).CreateWeakDecryptor(weakKey, decRndA);
+            byte[] decRndBr = decryptor.TransformFinalBlock(rndBr, 0, RND_SIZE);
 
             // Use decypherment to create the cryptogram
-            byte[] decRndABr = decryptor.TransformFinalBlock(rndABr, 0, rndABr.Length);
+            byte[] decRndABr = ByteArray.Concatenate(decRndA, decRndBr);
             Console.WriteLine(string.Format(">> Dec(RndA + RndB'): {0}", ByteArray.ToString(decRndABr)));
 
             return decRndABr;

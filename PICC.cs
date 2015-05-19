@@ -16,6 +16,11 @@ namespace Core.Security
         {
         }
 
+        public PICC(byte[] key)
+            : base(key)
+        {
+        }
+
         public byte[] AuthenticateStep1(int keyNo = 0)
         {
             Console.WriteLine();

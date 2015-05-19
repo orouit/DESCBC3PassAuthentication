@@ -127,5 +127,17 @@ namespace Core.Utility
             byte[] tmpRndr = ByteArray.RotateLeft(data);
             return ByteArray.AreSame(data_r, tmpRndr);
         }
+
+        static public byte[] ReverseBuffer(byte[] data)
+        {
+            byte[] reversed = new byte[data.Length];
+
+            for (int n = 0; n < data.Length; n++)
+            {
+                reversed[data.Length - n - 1] = data[n];
+            }
+
+            return reversed;
+        }
     }
 }
