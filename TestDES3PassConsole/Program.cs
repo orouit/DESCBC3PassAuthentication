@@ -17,20 +17,38 @@ namespace TestDESCBC3PassAuthentication
     {
         static void Main(string[] args)
         {
-            List<char> values = new List<char>() { '1', '2', '3' };
+            Test3DES_3PassAuthentication();
+        }
 
-            char point = values.Where(c => c == '.').FirstOrDefault();
-            int value = 1000;
-            byte[] valueBytes = BitConverter.GetBytes(value);
-            byte[] mifareBytes = ByteArray.ReverseBuffer(valueBytes);
+        static void Test3DES()
+        {
+            TripleDESCryptoServiceProvider tripleDESCrypto = new TripleDESCryptoServiceProvider();
+            tripleDESCrypto.KeySize = 128;
+            tripleDESCrypto.Mode = CipherMode.CBC;
+            tripleDESCrypto.Padding = PaddingMode.Zeros;
+            tripleDESCrypto.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            float fValue = 2345f;
-            string textValue = string.Format("{0:0.00}", fValue);
+            RandomNumberGenerator random = RNGCryptoServiceProvider.Create();
+            byte[] rnd = new byte[8];
+            random.GetNonZeroBytes(rnd);
 
-            // Use Key = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
-            byte[] key0 = new byte[16];
-            ByteArray.Fill(key0, 0);
-            PICC picc = new PICC(key0);
+            ICryptoTransform encryptor = tripleDESCrypto.CreateEncryptor();
+            byte[] encRnd = encryptor.TransformFinalBlock(rnd, 0, 8);
+
+            TripleDESCryptoServiceProvider tripleDESCrypto2 = new TripleDESCryptoServiceProvider();
+            tripleDESCrypto2.KeySize = 128;
+            tripleDESCrypto2.Mode = CipherMode.CBC;
+            tripleDESCrypto2.Padding = PaddingMode.Zeros;
+            tripleDESCrypto2.IV = tripleDESCrypto.IV;
+            tripleDESCrypto2.Key = tripleDESCrypto.Key;
+
+            ICryptoTransform decryptor = tripleDESCrypto2.CreateDecryptor();
+            byte[] decRnd = decryptor.TransformFinalBlock(encRnd, 0, 8);
+        }
+
+        static void Test3DES_3PassAuthentication()
+        {
+            PICC picc = new PICC();
 
             byte[] key = picc.Key;
             Console.WriteLine(string.Format(">> 3DES Key:          {0}", ByteArray.ToString(key)));
@@ -76,32 +94,6 @@ namespace TestDESCBC3PassAuthentication
             {
                 Console.WriteLine("PCD not authenticated by PICC");
             }
-        }
-
-        static void Test3DES()
-        {
-            TripleDESCryptoServiceProvider tripleDESCrypto = new TripleDESCryptoServiceProvider();
-            tripleDESCrypto.KeySize = 128;
-            tripleDESCrypto.Mode = CipherMode.CBC;
-            tripleDESCrypto.Padding = PaddingMode.Zeros;
-            tripleDESCrypto.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            RandomNumberGenerator random = RNGCryptoServiceProvider.Create();
-            byte[] rnd = new byte[8];
-            random.GetNonZeroBytes(rnd);
-
-            ICryptoTransform encryptor = tripleDESCrypto.CreateEncryptor();
-            byte[] encRnd = encryptor.TransformFinalBlock(rnd, 0, 8);
-
-            TripleDESCryptoServiceProvider tripleDESCrypto2 = new TripleDESCryptoServiceProvider();
-            tripleDESCrypto2.KeySize = 128;
-            tripleDESCrypto2.Mode = CipherMode.CBC;
-            tripleDESCrypto2.Padding = PaddingMode.Zeros;
-            tripleDESCrypto2.IV = tripleDESCrypto.IV;
-            tripleDESCrypto2.Key = tripleDESCrypto.Key;
-
-            ICryptoTransform decryptor = tripleDESCrypto2.CreateDecryptor();
-            byte[] decRnd = decryptor.TransformFinalBlock(encRnd, 0, 8);
         }
     }
 }

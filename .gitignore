@@ -41,3 +41,24 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+TestDES3PassConsole/bin/Debug/TestDESCBC3PassAuthentication.exe.config
+TestDES3PassConsole/bin/Debug/TestDESCBC3PassAuthentication.exe
+TestDES3PassConsole/bin/Debug/DES3PassLib.pdb
+TestDES3PassConsole/bin/Debug/DES3PassLib.dll
+TestDES3PassConsole/bin/Debug/TestDESCBC3PassAuthentication.pdb
+TestDES3PassConsole/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+TestDES3PassConsole/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+TestDES3PassConsole/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+TestDES3PassConsole/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
+TestDES3PassConsole/obj/Debug/TestDESCBC3PassAuthentication.csproj.FileListAbsolute.txt
+TestDES3PassConsole/obj/Debug/TestDESCBC3PassAuthentication.csprojResolveAssemblyReference.cache
+TestDES3PassConsole/obj/Debug/TestDESCBC3PassAuthentication.exe
+TestDES3PassConsole/obj/Debug/TestDESCBC3PassAuthentication.pdb
+DES3PassLib/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+DES3PassLib/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+DES3PassLib/obj/Debug/DES3PassLib.pdb
+DES3PassLib/obj/Debug/DES3PassLib.dll
+DES3PassLib/obj/Debug/DES3PassLib.csprojResolveAssemblyReference.cache
+DES3PassLib/obj/Debug/DES3PassLib.csproj.FileListAbsolute.txt
+DES3PassLib/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+DES3PassLib/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
